@@ -15,3 +15,8 @@ steps:
     FeedUser: $(FeedUser)
     FeedSecret: $(FeedSecret)
   displayName: Run Nuke
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
