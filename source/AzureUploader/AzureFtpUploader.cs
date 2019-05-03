@@ -16,7 +16,7 @@ namespace AzureUploader
 
         private FtpClient Client => _client ?? (_client = Connect());
 
-        public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null) => _clientFactory = clientFactory;
+        public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null) => (_clientFactory, _logger) = (clientFactory, logger);
 
         public void Deploy(string directory)
         {
