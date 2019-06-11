@@ -1,15 +1,16 @@
-﻿using AzureUploader.FtpCommands;
+﻿using AzureUploader.Checksums;
+using AzureUploader.FtpCommands;
 using FluentFTP;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
-using System.Security.Cryptography;
 
 namespace AzureUploader
 {
     public class AzureFtpUploader
     {
         private const string RootDirectory = "/site/wwwroot";
+        private readonly IChecksumCalculator _checksumCalculator = new Md5Calculator();
         private readonly FtpCommandExecutor _ftpExecutor;
         private readonly IClassLogger _logger;
 
@@ -79,18 +80,8 @@ namespace AzureUploader
                 var targetPath = $"{target}/{name}";
                 _logger.Log("Upload: " + targetPath);
                 _logger.Log($"Size={new FileInfo(file).Length}");
-                _logger.Log($"MD5={GetFileMd5(file)}");
+                _logger.Log($"MD5={_checksumCalculator.CalculateChecksum(file)}");
                 _ftpExecutor.Execute(c => c.UploadFile(file, targetPath));
-            }
-        }
-
-        private string GetFileMd5(string path)
-        {
-            using(var md5 = MD5.Create())
-            using (var stream = File.OpenRead(path))
-            {
-                var hash = md5.ComputeHash(stream);
-                return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
         }
     }
