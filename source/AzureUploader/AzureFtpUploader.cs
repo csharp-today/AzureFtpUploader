@@ -81,7 +81,7 @@ namespace AzureUploader
                 catch (Exception)
                 {
                     // Usually Azure FTP needs to stage a new connection
-                    _client.Dispose();
+                    _client?.Dispose();
                     _client = null;
 
                     count--;
