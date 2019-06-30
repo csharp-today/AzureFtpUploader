@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading;
 
 namespace AzureUploader
@@ -38,6 +39,8 @@ namespace AzureUploader
                 {
                     case FtpFileSystemObjectType.File:
                     case FtpFileSystemObjectType.Link:
+                        Log($"Size={FtpCall(c => c.GetFileSize(item.FullName))}");
+                        Log($"MD5={FtpCall(c => c.GetMD5(item.FullName))}");
                         FtpCall(c => c.DeleteFile(item.FullName));
                         break;
                     case FtpFileSystemObjectType.Directory:
@@ -121,7 +124,19 @@ namespace AzureUploader
                 var name = Path.GetFileName(file);
                 var targetPath = $"{target}/{name}";
                 Log("Upload: " + targetPath);
+                Log($"Size={new FileInfo(file).Length}");
+                Log($"MD5={GetFileMd5(file)}");
                 FtpCall(c => c.UploadFile(file, targetPath));
+            }
+        }
+
+        private string GetFileMd5(string path)
+        {
+            using(var md5 = MD5.Create())
+            using (var stream = File.OpenRead(path))
+            {
+                var hash = md5.ComputeHash(stream);
+                return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
         }
     }
