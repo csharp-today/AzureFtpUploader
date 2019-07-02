@@ -11,22 +11,22 @@ namespace AzureUploader
     {
         private const string RootDirectory = "/site/wwwroot";
         private readonly Func<FtpClient> _clientFactory;
+        private readonly ClassLogger<AzureFtpUploader> _logger;
 
         private FtpClient _client;
-        private ILogger _logger;
 
         private FtpClient Client => _client ?? (_client = Connect());
 
-        public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null) => (_clientFactory, _logger) = (clientFactory, logger);
+        public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null) => (_clientFactory, _logger) = (clientFactory, new ClassLogger<AzureFtpUploader>(logger));
 
         public void Deploy(string directory)
         {
             EnsurePublishDirectoryExists(directory);
-            Log("CLEAN FTP");
+            _logger.Log("CLEAN FTP");
             Clean();
-            Log("PUSH NEW CONTENT");
+            _logger.Log("PUSH NEW CONTENT");
             Push(directory);
-            Log("DEPLOYMENT DONE");
+            _logger.Log("DEPLOYMENT DONE");
         }
 
         private void Clean(string path = RootDirectory)
@@ -34,13 +34,13 @@ namespace AzureUploader
             var items = FtpCall(c => c.GetListing(path));
             foreach (var item in items)
             {
-                Log($"Remove {item.Type.ToString().ToLower()}: {item.FullName}");
+                _logger.Log($"Remove {item.Type.ToString().ToLower()}: {item.FullName}");
                 switch (item.Type)
                 {
                     case FtpFileSystemObjectType.File:
                     case FtpFileSystemObjectType.Link:
-                        Log($"Size={FtpCall(c => c.GetFileSize(item.FullName))}");
-                        Log($"MD5={FtpCall(c => c.GetMD5(item.FullName))}");
+                        _logger.Log($"Size={FtpCall(c => c.GetFileSize(item.FullName))}");
+                        _logger.Log($"MD5={FtpCall(c => c.GetMD5(item.FullName))}");
                         FtpCall(c => c.DeleteFile(item.FullName));
                         break;
                     case FtpFileSystemObjectType.Directory:
@@ -88,12 +88,12 @@ namespace AzureUploader
                     _client = null;
 
                     count--;
-                    Log("Failed - retry count: " + count);
+                    _logger.Log("Failed - retry count: " + count);
                     if (count <= 0)
                     {
                         throw;
                     }
-                    Log($"Will retry in {time} seconds");
+                    _logger.Log($"Will retry in {time} seconds");
                     Thread.Sleep(time * 1000);
                     time *= 2;
                 }
@@ -101,8 +101,6 @@ namespace AzureUploader
 
             throw new NotImplementedException();
         }
-
-        private void Log(string message) => _logger?.LogInformation($"{nameof(AzureFtpUploader)}: {message}");
 
         private void Push(string directory) => PushDirectory(directory, RootDirectory);
 
@@ -113,7 +111,7 @@ namespace AzureUploader
             {
                 var name = Path.GetFileName(dir);
                 var targetPath = $"{target}/{name}";
-                Log("Create: " + targetPath);
+                _logger.Log("Create: " + targetPath);
                 FtpCall(c => c.CreateDirectory(targetPath));
                 PushDirectory(dir, targetPath);
             }
@@ -123,9 +121,9 @@ namespace AzureUploader
             {
                 var name = Path.GetFileName(file);
                 var targetPath = $"{target}/{name}";
-                Log("Upload: " + targetPath);
-                Log($"Size={new FileInfo(file).Length}");
-                Log($"MD5={GetFileMd5(file)}");
+                _logger.Log("Upload: " + targetPath);
+                _logger.Log($"Size={new FileInfo(file).Length}");
+                _logger.Log($"MD5={GetFileMd5(file)}");
                 FtpCall(c => c.UploadFile(file, targetPath));
             }
         }
