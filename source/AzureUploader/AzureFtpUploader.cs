@@ -40,7 +40,6 @@ namespace AzureUploader
                     case FtpFileSystemObjectType.File:
                     case FtpFileSystemObjectType.Link:
                         _logger.Log($"Size={FtpCall(c => c.GetFileSize(item.FullName))}");
-                        _logger.Log($"MD5={FtpCall(c => c.GetMD5(item.FullName))}");
                         FtpCall(c => c.DeleteFile(item.FullName));
                         break;
                     case FtpFileSystemObjectType.Directory:
