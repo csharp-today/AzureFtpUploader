@@ -2,7 +2,7 @@
 
 namespace AzureUploader
 {
-    internal class ClassLogger<T>
+    internal class ClassLogger<T> : IClassLogger
     {
         private readonly ILogger _logger;
 

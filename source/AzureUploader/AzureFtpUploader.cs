@@ -11,7 +11,7 @@ namespace AzureUploader
     {
         private const string RootDirectory = "/site/wwwroot";
         private readonly Func<FtpClient> _clientFactory;
-        private readonly ClassLogger<AzureFtpUploader> _logger;
+        private readonly IClassLogger _logger;
 
         private FtpClient _client;
 
