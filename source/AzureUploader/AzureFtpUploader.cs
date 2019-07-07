@@ -1,4 +1,5 @@
-﻿using FluentFTP;
+﻿using AzureUploader.FtpCommands;
+using FluentFTP;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -10,14 +11,11 @@ namespace AzureUploader
     public class AzureFtpUploader
     {
         private const string RootDirectory = "/site/wwwroot";
-        private readonly Func<FtpClient> _clientFactory;
         private readonly IClassLogger _logger;
+        private readonly IFtpClientProvider _ftpClientProvider;
 
-        private FtpClient _client;
-
-        private FtpClient Client => _client ?? (_client = Connect());
-
-        public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null) => (_clientFactory, _logger) = (clientFactory, new ClassLogger<AzureFtpUploader>(logger));
+        public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null) =>
+            (_ftpClientProvider, _logger) = (new FtpClientProvider(clientFactory), new ClassLogger<AzureFtpUploader>(logger));
 
         public void Deploy(string directory)
         {
@@ -50,16 +48,6 @@ namespace AzureUploader
             }
         }
 
-        private FtpClient Connect()
-        {
-            var client = _clientFactory();
-            client.EncryptionMode = FtpEncryptionMode.Explicit;
-            client.ReadTimeout = 60_000;
-            client.RetryAttempts = 3;
-            client.Connect();
-            return client;
-        }
-
         private void EnsurePublishDirectoryExists(string directory)
         {
             if (!Directory.Exists(directory))
@@ -78,13 +66,12 @@ namespace AzureUploader
             {
                 try
                 {
-                    return operation(Client);
+                    return operation(_ftpClientProvider.GetClient());
                 }
                 catch (Exception)
                 {
                     // Usually Azure FTP needs to stage a new connection
-                    _client?.Dispose();
-                    _client = null;
+                    _ftpClientProvider.CloseActiveClient();
 
                     count--;
                     _logger.Log("Failed - retry count: " + count);
