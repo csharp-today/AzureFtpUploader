@@ -26,7 +26,6 @@ namespace AzureUploader.FtpCommands
 
         public FtpClient GetClient()
         {
-            FtpClient client;
             lock (_lock)
             {
                 if (_client is null)
