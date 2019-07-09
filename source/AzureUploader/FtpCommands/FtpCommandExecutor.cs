@@ -4,17 +4,17 @@ using System.Threading;
 
 namespace AzureUploader.FtpCommands
 {
-    internal class BaseFtpCommand
+    internal class FtpCommandExecutor : IFtpCommandExecutor
     {
         private readonly IFtpClientProvider _ftpClientProvider;
         private readonly IClassLogger _logger;
 
-        public BaseFtpCommand(IFtpClientProvider ftpClientProvider, IClassLogger logger) =>
+        public FtpCommandExecutor(IFtpClientProvider ftpClientProvider, IClassLogger logger) =>
             (_ftpClientProvider, _logger) = (ftpClientProvider, logger);
 
-        public void FtpCall(Action<FtpClient> operation) => FtpCall(c => { operation(c); return 0; });
+        public void Execute(Action<FtpClient> operation) => Execute(c => { operation(c); return 0; });
 
-        public T FtpCall<T>(Func<FtpClient, T> operation)
+        public T Execute<T>(Func<FtpClient, T> operation)
         {
             int time = 3;
             int count = 6;
