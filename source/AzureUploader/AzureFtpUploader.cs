@@ -10,14 +10,15 @@ namespace AzureUploader
     public class AzureFtpUploader
     {
         private const string RootDirectory = "/site/wwwroot";
-        private readonly IChecksumCalculator _checksumCalculator = new Md5Calculator();
-        private readonly FtpCommandExecutor _ftpExecutor;
+        private readonly IFtpCommandExecutor _ftpExecutor;
+        private readonly IFtpUploader _ftpUploader;
         private readonly IClassLogger _logger;
 
         public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null)
         {
             _logger = new ClassLogger<AzureFtpUploader>(logger);
             _ftpExecutor = new FtpCommandExecutor(new FtpClientProvider(clientFactory), _logger);
+            _ftpUploader = new FtpUploader(new Md5Calculator(), _ftpExecutor, _logger);
         }
 
         public void Deploy(string directory)
@@ -76,12 +77,7 @@ namespace AzureUploader
             var files = Directory.GetFiles(source);
             foreach (var file in files)
             {
-                var name = Path.GetFileName(file);
-                var targetPath = $"{target}/{name}";
-                _logger.Log("Upload: " + targetPath);
-                _logger.Log($"Size={new FileInfo(file).Length}");
-                _logger.Log($"MD5={_checksumCalculator.CalculateChecksum(file)}");
-                _ftpExecutor.Execute(c => c.UploadFile(file, targetPath));
+                _ftpUploader.UploadFile(file, $"{target}/{Path.GetFileName(file)}");
             }
         }
     }
