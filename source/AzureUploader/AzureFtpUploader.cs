@@ -27,7 +27,7 @@ namespace AzureUploader
             _logger.Log("CLEAN FTP");
             Clean();
             _logger.Log("PUSH NEW CONTENT");
-            Push(directory);
+            _ftpUploader.UploadDirectory(directory, RootDirectory);
             _logger.Log("DEPLOYMENT DONE");
         }
 
@@ -57,27 +57,6 @@ namespace AzureUploader
             if (!Directory.Exists(directory))
             {
                 throw new Exception("Publish directory doesn't exist: " + directory);
-            }
-        }
-
-        private void Push(string directory) => PushDirectory(directory, RootDirectory);
-
-        private void PushDirectory(string source, string target)
-        {
-            var directories = Directory.GetDirectories(source);
-            foreach (var dir in directories)
-            {
-                var name = Path.GetFileName(dir);
-                var targetPath = $"{target}/{name}";
-                _logger.Log("Create: " + targetPath);
-                _ftpExecutor.Execute(c => c.CreateDirectory(targetPath));
-                PushDirectory(dir, targetPath);
-            }
-
-            var files = Directory.GetFiles(source);
-            foreach (var file in files)
-            {
-                _ftpUploader.UploadFile(file, $"{target}/{Path.GetFileName(file)}");
             }
         }
     }
