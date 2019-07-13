@@ -11,14 +11,14 @@ namespace AzureUploader
     {
         private const string RootDirectory = "/site/wwwroot";
         private readonly IFtpCommandExecutor _ftpExecutor;
-        private readonly IFtpUploader _ftpUploader;
+        private readonly IFtpDirectoryUploader _ftpUploader;
         private readonly IClassLogger _logger;
 
         public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null)
         {
             _logger = new ClassLogger<AzureFtpUploader>(logger);
             _ftpExecutor = new FtpCommandExecutor(new FtpClientProvider(clientFactory), _logger);
-            _ftpUploader = new FtpUploader(new Md5Calculator(), _ftpExecutor, _logger);
+            _ftpUploader = new FtpDirectoryUploader(_ftpExecutor, new FtpFileUploader(new Md5Calculator(), _ftpExecutor, _logger), _logger);
         }
 
         public void Deploy(string directory)

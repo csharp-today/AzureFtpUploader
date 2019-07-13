@@ -1,8 +1,7 @@
 ﻿namespace AzureUploader.FtpCommands
 {
-    internal interface IFtpUploader
+    internal interface IFtpFileUploader
     {
-        void UploadDirectory(string directoryPath, string targetPath);
         void UploadFile(string filePath, string targetPath);
     }
 }
