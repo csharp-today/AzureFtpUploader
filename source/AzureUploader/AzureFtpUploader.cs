@@ -12,12 +12,14 @@ namespace AzureUploader
         private const string RootDirectory = "/site/wwwroot";
         private readonly IFtpCommandExecutor _ftpExecutor;
         private readonly IFtpDirectoryUploader _ftpUploader;
+        private readonly IFtpFileRemover _ftpRemover;
         private readonly IClassLogger _logger;
 
         public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null)
         {
             _logger = new ClassLogger<AzureFtpUploader>(logger);
             _ftpExecutor = new FtpCommandExecutor(new FtpClientProvider(clientFactory), _logger);
+            _ftpRemover = new FtpFileRemover(_ftpExecutor, _logger);
             _ftpUploader = new FtpDirectoryUploader(_ftpExecutor, new FtpFileUploader(new Md5Calculator(), _ftpExecutor, _logger), _logger);
         }
 
@@ -41,8 +43,7 @@ namespace AzureUploader
                 {
                     case FtpFileSystemObjectType.File:
                     case FtpFileSystemObjectType.Link:
-                        _logger.Log($"Size={_ftpExecutor.Execute(c => c.GetFileSize(item.FullName))}");
-                        _ftpExecutor.Execute(c => c.DeleteFile(item.FullName));
+                        _ftpRemover.RemoveFile(item.FullName);
                         break;
                     case FtpFileSystemObjectType.Directory:
                         Clean(item.FullName);
