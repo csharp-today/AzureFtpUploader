@@ -9,18 +9,23 @@ namespace AzureUploader
 {
     public class AzureFtpUploader
     {
-        private const string RootDirectory = "/site/wwwroot";
-        private readonly IFtpCommandExecutor _ftpExecutor;
+        private const string ChecksumDirectory = "/site";
+        private const string ChecksumFilePath = ChecksumDirectory + "/checksum.txt";
+        private const string RootDirectory = ChecksumDirectory + "/wwwroot";
+        private readonly ChecksumDataStorage _checksumDataStorage = new ChecksumDataStorage();
         private readonly IFtpDirectoryRemover _ftpRemover;
-        private readonly IFtpDirectoryUploader _ftpUploader;
+        private readonly IFtpDirectoryUploader _ftpDirectoryUploader;
+        private readonly IFtpTextUploader _ftpTextUploader;
         private readonly IClassLogger _logger;
 
         public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null)
         {
             _logger = new ClassLogger<AzureFtpUploader>(logger);
-            _ftpExecutor = new FtpCommandExecutor(new FtpClientProvider(clientFactory), _logger);
-            _ftpRemover = new FtpDirectoryRemover(_ftpExecutor, new FtpFileRemover(_ftpExecutor, _logger), _logger);
-            _ftpUploader = new FtpDirectoryUploader(_ftpExecutor, new FtpFileUploader(new Md5Calculator(), _ftpExecutor, _logger), _logger);
+            var ftpExecutor = new FtpCommandExecutor(new FtpClientProvider(clientFactory), _logger);
+            _ftpRemover = new FtpDirectoryRemover(ftpExecutor, new FtpFileRemover(ftpExecutor, _logger), _logger);
+            var ftpFileUploader = new FtpFileUploader(new Md5Calculator(), ftpExecutor, _logger, _checksumDataStorage);
+            _ftpDirectoryUploader = new FtpDirectoryUploader(ftpExecutor, ftpFileUploader, _logger);
+            _ftpTextUploader = new FtpTextUploader(ftpFileUploader);
         }
 
         public void Deploy(string directory)
@@ -29,7 +34,9 @@ namespace AzureUploader
             _logger.Log("CLEAN FTP");
             _ftpRemover.RemoveDirectory(RootDirectory);
             _logger.Log("PUSH NEW CONTENT");
-            _ftpUploader.UploadDirectory(directory, RootDirectory);
+            _ftpDirectoryUploader.UploadDirectory(directory, RootDirectory);
+            _logger.Log("UPLOAD CHECKSUMs");
+            _ftpTextUploader.UploadText(_checksumDataStorage.GetStorageDump(), ChecksumFilePath);
             _logger.Log("DEPLOYMENT DONE");
         }
 

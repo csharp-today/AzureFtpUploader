@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace AzureUploader.Checksums
+{
+    internal class ChecksumDataStorage
+    {
+        private readonly object _lock = new object();
+        private readonly Dictionary<string, string> _storage = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+
+        public void Store(string path, string checksum)
+        {
+            lock (_lock)
+            {
+                if (_storage.ContainsKey(path))
+                {
+                    _storage[path] = checksum;
+                }
+                else
+                {
+                    _storage.Add(path, checksum);
+                }
+            }
+        }
+
+        public string GetStorageDump()
+        {
+            lock (_lock)
+            {
+                var keys = _storage.Keys.ToArray();
+                Array.Sort(keys);
+
+                var lines = keys.Select(key => $"{key};{_storage[key]}").ToArray();
+                var text = string.Join(Environment.NewLine, lines);
+                return text;
+            }
+        }
+    }
+}
