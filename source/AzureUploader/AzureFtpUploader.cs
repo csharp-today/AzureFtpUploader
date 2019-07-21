@@ -1,5 +1,4 @@
 ﻿using AzureUploader.Checksums;
-using AzureUploader.FtpCommands;
 using FluentFTP;
 using Microsoft.Extensions.Logging;
 using System;
@@ -20,8 +19,12 @@ namespace AzureUploader
         public void Deploy(string directory)
         {
             EnsurePublishDirectoryExists(directory);
+            Log("READ FTP CHECKSUMs");
+            var checksums = new ChecksumDataStorage();
+            checksums.RestoreFromDump(_ftpManager.ReadText(ChecksumFilePath));
             Log("CLEAN FTP");
             _ftpManager.RemoveDirectory(RootDirectory);
+            _ftpManager.RemoveFile(ChecksumFilePath);
             Log("PUSH NEW CONTENT");
             _ftpManager.UploadDirectory(directory, RootDirectory);
             Log("UPLOAD CHECKSUMs");

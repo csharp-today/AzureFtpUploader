@@ -36,5 +36,18 @@ namespace AzureUploader.Checksums
                 return text;
             }
         }
+
+        public void RestoreFromDump(string dump)
+        {
+            lock (_lock)
+            {
+                _storage.Clear();
+                foreach (var line in dump.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var cells = line.Split(';');
+                    _storage.Add(cells[0], cells[1]);
+                }
+            }
+        }
     }
 }
