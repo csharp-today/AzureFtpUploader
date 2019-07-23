@@ -1,4 +1,5 @@
 ﻿using AzureUploader.Checksums;
+using AzureUploader.DirectoryTrees;
 using FluentFTP;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,14 +12,22 @@ namespace AzureUploader
         private const string ChecksumDirectory = "/site";
         private const string ChecksumFilePath = ChecksumDirectory + "/checksum.txt";
         private const string RootDirectory = ChecksumDirectory + "/wwwroot";
-        
+
+        private readonly IDirectoryTreeBuilder _directoryTreeBuilder;
         private readonly IFtpManager _ftpManager;
 
-        public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null) => _ftpManager = new FtpManager(clientFactory, logger);
+        public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null)
+        {
+            _directoryTreeBuilder = new DirectoryTreeBuilder();
+            _ftpManager = new FtpManager(clientFactory, logger);
+        }
 
         public void Deploy(string directory)
         {
+            Log("ANALYZE DIRECTORY TO UPLOAD");
             EnsurePublishDirectoryExists(directory);
+            var directoryTree = _directoryTreeBuilder.BuildUsingLocalDirectory(directory, RootDirectory);
+            Log(directoryTree.ToString());
             Log("READ FTP CHECKSUMs");
             var checksums = new ChecksumDataStorage();
             checksums.RestoreFromDump(_ftpManager.ReadText(ChecksumFilePath));
