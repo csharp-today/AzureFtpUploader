@@ -18,6 +18,11 @@ namespace AzureUploader.DirectoryTrees
                 var subTree = tree.AddDirectory(Path.GetFileName(directory));
                 AddContent(directory, subTree);
             }
+
+            foreach (var file in Directory.GetFiles(path))
+            {
+                tree.AddFile(Path.GetFileName(file));
+            }
         }
     }
 }

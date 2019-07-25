@@ -6,6 +6,6 @@ namespace AzureUploader.DirectoryTrees
     {
         public DirectoryTree(string path) : base(null, path) { }
 
-        public override string ToString() => $"Directory tree:{Environment.NewLine}{Path}{Environment.NewLine}{base.ToString()}";
+        public override string ToString() => $"Directory tree: {Path}{Environment.NewLine}{base.ToString()}";
     }
 }
