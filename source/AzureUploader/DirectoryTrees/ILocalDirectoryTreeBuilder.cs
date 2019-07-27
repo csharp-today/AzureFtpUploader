@@ -1,6 +1,6 @@
 ﻿namespace AzureUploader.DirectoryTrees
 {
-    internal interface IDirectoryTreeBuilder
+    internal interface ILocalDirectoryTreeBuilder
     {
         DirectoryTree BuildUsingLocalDirectory(string localPath, string overridePathInTree);
     }

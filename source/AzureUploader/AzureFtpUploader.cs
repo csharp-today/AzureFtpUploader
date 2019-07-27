@@ -13,12 +13,14 @@ namespace AzureUploader
         private const string ChecksumFilePath = ChecksumDirectory + "/checksum.txt";
         private const string RootDirectory = ChecksumDirectory + "/wwwroot";
 
-        private readonly IDirectoryTreeBuilder _directoryTreeBuilder;
+        private readonly IFtpDirectoryTreeBuilder _ftpDirectoryTreeBuilder;
+        private readonly ILocalDirectoryTreeBuilder _localDirectoryTreeBuilder;
         private readonly IFtpManager _ftpManager;
 
         public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null)
         {
-            _directoryTreeBuilder = new DirectoryTreeBuilder();
+            _ftpDirectoryTreeBuilder = new FtpDirectoryTreeBuilder();
+            _localDirectoryTreeBuilder = new LocalDirectoryTreeBuilder();
             _ftpManager = new FtpManager(clientFactory, logger);
         }
 
@@ -26,8 +28,11 @@ namespace AzureUploader
         {
             Log("ANALYZE DIRECTORY TO UPLOAD");
             EnsurePublishDirectoryExists(directory);
-            var directoryTree = _directoryTreeBuilder.BuildUsingLocalDirectory(directory, RootDirectory);
-            Log(directoryTree.ToString());
+            var localTree = _localDirectoryTreeBuilder.BuildUsingLocalDirectory(directory, RootDirectory);
+            Log(localTree.ToString());
+            Log("ANALYZE TARGET DIRECTORY");
+            var targetTree = _ftpDirectoryTreeBuilder.BuildUsingFtpDirectory(RootDirectory);
+            Log(targetTree.ToString());
             Log("READ FTP CHECKSUMs");
             var checksums = new ChecksumDataStorage();
             checksums.RestoreFromDump(_ftpManager.ReadText(ChecksumFilePath));

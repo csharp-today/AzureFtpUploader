@@ -2,7 +2,7 @@
 
 namespace AzureUploader.DirectoryTrees
 {
-    internal class DirectoryTreeBuilder : IDirectoryTreeBuilder
+    internal class LocalDirectoryTreeBuilder : ILocalDirectoryTreeBuilder
     {
         public DirectoryTree BuildUsingLocalDirectory(string localPath, string overrideRootInTree = null)
         {
