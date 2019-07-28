@@ -8,6 +8,7 @@ namespace AzureUploader
 {
     internal class FtpManager : IFtpManager
     {
+        private readonly IFtpContentGetter _ftpContentGetter;
         private readonly IFtpDirectoryRemover _ftpDirectoryRemover;
         private readonly IFtpDirectoryUploader _ftpDirectoryUploader;
         private readonly IFtpFileRemover _ftpFileRemover;
@@ -22,13 +23,15 @@ namespace AzureUploader
             Logger = new ClassLogger<AzureFtpUploader>(logger);
             var ftpExecutor = new FtpCommandExecutor(new FtpClientProvider(clientFactory), Logger);
             _ftpFileRemover = new FtpFileRemover(ftpExecutor, Logger);
-            _ftpDirectoryRemover = new FtpDirectoryRemover(ftpExecutor, _ftpFileRemover, Logger);
+            _ftpContentGetter = new FtpContentGetter(ftpExecutor);
+            _ftpDirectoryRemover = new FtpDirectoryRemover(ftpExecutor, _ftpContentGetter, _ftpFileRemover, Logger);
             var ftpFileUploader = new FtpFileUploader(new Md5Calculator(), ftpExecutor, Logger, ChecksumDataStorage);
             _ftpDirectoryUploader = new FtpDirectoryUploader(ftpExecutor, ftpFileUploader, Logger);
             _ftpTextReader = new FtpTextReader(ftpExecutor);
             _ftpTextUploader = new FtpTextUploader(ftpFileUploader);
         }
 
+        public FtpListItem[] GetContent(string path) => _ftpContentGetter.GetContent(path);
         public string ReadText(string path) => _ftpTextReader.ReadText(path);
         public void RemoveDirectory(string path) => _ftpDirectoryRemover.RemoveDirectory(path);
         public void RemoveFile(string path) => _ftpFileRemover.RemoveFile(path);

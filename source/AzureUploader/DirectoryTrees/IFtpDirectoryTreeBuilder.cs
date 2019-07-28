@@ -2,6 +2,6 @@
 {
     internal interface IFtpDirectoryTreeBuilder
     {
-        DirectoryTree BuildUsingFtpDirectory(string ftpPath);
+        DirectoryTree BuildUsingFtpDirectory(IFtpManager ftpManager, string ftpPath);
     }
 }

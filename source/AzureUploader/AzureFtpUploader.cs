@@ -31,7 +31,7 @@ namespace AzureUploader
             var localTree = _localDirectoryTreeBuilder.BuildUsingLocalDirectory(directory, RootDirectory);
             Log(localTree.ToString());
             Log("ANALYZE TARGET DIRECTORY");
-            var targetTree = _ftpDirectoryTreeBuilder.BuildUsingFtpDirectory(RootDirectory);
+            var targetTree = _ftpDirectoryTreeBuilder.BuildUsingFtpDirectory(_ftpManager, RootDirectory);
             Log(targetTree.ToString());
             Log("READ FTP CHECKSUMs");
             var checksums = new ChecksumDataStorage();
