@@ -2,6 +2,6 @@
 {
     internal interface ILocalDirectoryTreeBuilder
     {
-        DirectoryTree BuildUsingLocalDirectory(string localPath, string overridePathInTree);
+        DirectoryTree BuildUsingLocalDirectory(string localPath);
     }
 }

@@ -28,7 +28,7 @@ namespace AzureUploader
         {
             Log("ANALYZE DIRECTORY TO UPLOAD");
             EnsurePublishDirectoryExists(directory);
-            var localTree = _localDirectoryTreeBuilder.BuildUsingLocalDirectory(directory, RootDirectory);
+            var localTree = _localDirectoryTreeBuilder.BuildUsingLocalDirectory(directory);
             Log(localTree.ToString());
             Log("ANALYZE TARGET DIRECTORY");
             var targetTree = _ftpDirectoryTreeBuilder.BuildUsingFtpDirectory(_ftpManager, RootDirectory);

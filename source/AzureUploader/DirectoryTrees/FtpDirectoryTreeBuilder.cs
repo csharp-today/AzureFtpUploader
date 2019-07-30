@@ -21,6 +21,10 @@ namespace AzureUploader.DirectoryTrees
                         var subTree = tree.AddDirectory(ftpItem.Name);
                         AddContent(subTree, ftpManager, ftpItem.FullName);
                         break;
+                    case FtpFileSystemObjectType.File:
+                    case FtpFileSystemObjectType.Link:
+                        tree.AddFile(ftpItem.Name);
+                        break;
                 }
             }
         }
