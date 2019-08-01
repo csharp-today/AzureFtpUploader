@@ -16,6 +16,7 @@ namespace AzureUploader
         private readonly IFtpDirectoryTreeBuilder _ftpDirectoryTreeBuilder;
         private readonly ILocalDirectoryTreeBuilder _localDirectoryTreeBuilder;
         private readonly IFtpManager _ftpManager;
+        private readonly ITreeComparer _treeComparer = new TreeComparer();
 
         public AzureFtpUploader(Func<FtpClient> clientFactory, ILogger logger = null)
         {
@@ -36,6 +37,9 @@ namespace AzureUploader
             Log("READ FTP CHECKSUMs");
             var checksums = new ChecksumDataStorage();
             checksums.RestoreFromDump(_ftpManager.ReadText(ChecksumFilePath));
+            Log("COMPARE SOURCE AND TARGET");
+            var diffTree = _treeComparer.Compare(localTree, targetTree);
+            Log(diffTree.ToString());
             Log("CLEAN FTP");
             _ftpManager.RemoveDirectory(RootDirectory);
             _ftpManager.RemoveFile(ChecksumFilePath);
