@@ -4,7 +4,8 @@
     {
         ItemPresent,
         ItemToCopy,
-        ItemPresentInSourceAndTarget,
-        ItemToRemove
+        ItemToRemove,
+        ItemToUpdate,
+        ItemsWithTheSameSize
     }
 }

@@ -18,9 +18,9 @@ namespace AzureUploader.DirectoryTrees
             foreach (var sourceFile in source?.Files ?? Enumerable.Empty<DirectoryTreeFileData>())
             {
                 var diffFile = diff.AddFile(sourceFile.Name);
-                diffFile.Status = target is null || target.Files.Any(f => f.Name == sourceFile.Name)
-                    ? ItemStatus.ItemPresentInSourceAndTarget
-                    : ItemStatus.ItemToCopy;
+                diffFile.Source = sourceFile;
+                diffFile.Target = target?.Files?.FirstOrDefault(f => f.Name == sourceFile.Name);
+                diffFile.Status = GetFileStatus(diffFile);
                 AddUniqueStatus(diffFile.Status);
             }
 
@@ -29,7 +29,8 @@ namespace AzureUploader.DirectoryTrees
                 if (source is null || !source.Files.Any(f => f.Name == targetFile.Name))
                 {
                     var diffFile = diff.AddFile(targetFile.Name);
-                    diffFile.Status = ItemStatus.ItemToRemove;
+                    diffFile.Target = targetFile;
+                    diffFile.Status = GetFileStatus(diffFile);
                     AddUniqueStatus(diffFile.Status);
                 }
             }
@@ -51,7 +52,7 @@ namespace AzureUploader.DirectoryTrees
                 }
             }
 
-            diff.Status = statuses.Count == 0 ? statuses[0] : ItemStatus.ItemPresentInSourceAndTarget;
+            diff.Status = statuses.Count == 0 ? statuses[0] : ItemStatus.ItemToUpdate;
 
             void AddUniqueStatus(ItemStatus status)
             {
@@ -60,6 +61,26 @@ namespace AzureUploader.DirectoryTrees
                     statuses.Add(status);
                 }
             }
+        }
+
+        private ItemStatus GetFileStatus(DirectoryTreeFileData fileData)
+        {
+            if (fileData.Target is null)
+            {
+                return ItemStatus.ItemToCopy;
+            }
+
+            if (fileData.Source is null)
+            {
+                return ItemStatus.ItemToRemove;
+            }
+
+            if (fileData.Source.Size != fileData.Target.Size)
+            {
+                return ItemStatus.ItemToUpdate;
+            }
+
+            return ItemStatus.ItemsWithTheSameSize;
         }
     }
 }

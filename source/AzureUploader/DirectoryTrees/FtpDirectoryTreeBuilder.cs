@@ -23,7 +23,8 @@ namespace AzureUploader.DirectoryTrees
                         break;
                     case FtpFileSystemObjectType.File:
                     case FtpFileSystemObjectType.Link:
-                        tree.AddFile(ftpItem.Name);
+                        var fileData = tree.AddFile(ftpItem.Name);
+                        fileData.Size = ftpItem.Size;
                         break;
                 }
             }

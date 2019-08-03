@@ -21,7 +21,8 @@ namespace AzureUploader.DirectoryTrees
 
             foreach (var file in Directory.GetFiles(path))
             {
-                tree.AddFile(Path.GetFileName(file));
+                var fileData = tree.AddFile(Path.GetFileName(file));
+                fileData.Size = new FileInfo(file).Length;
             }
         }
     }
