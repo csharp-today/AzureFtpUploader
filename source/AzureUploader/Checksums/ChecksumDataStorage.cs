@@ -9,6 +9,14 @@ namespace AzureUploader.Checksums
         private readonly object _lock = new object();
         private readonly Dictionary<string, string> _storage = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
+        public string GetChecksum(string path)
+        {
+            lock (_lock)
+            {
+                return _storage.TryGetValue(path, out var checksum) ? checksum : null;
+            }
+        }
+
         public void Store(string path, string checksum)
         {
             lock (_lock)

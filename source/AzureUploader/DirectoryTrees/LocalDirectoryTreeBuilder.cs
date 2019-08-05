@@ -1,12 +1,17 @@
-﻿using System.IO;
+﻿using AzureUploader.Checksums;
+using System.IO;
 
 namespace AzureUploader.DirectoryTrees
 {
     internal class LocalDirectoryTreeBuilder : ILocalDirectoryTreeBuilder
     {
+        private readonly IChecksumProvider _checksumProvider;
+
+        public LocalDirectoryTreeBuilder(IChecksumProvider checksumProvider) => _checksumProvider = checksumProvider;
+
         public DirectoryTree BuildUsingLocalDirectory(string localPath)
         {
-            var tree = new DirectoryTree(localPath);
+            var tree = new DirectoryTree(localPath, _checksumProvider);
             AddContent(localPath, tree);
             return tree;
         }

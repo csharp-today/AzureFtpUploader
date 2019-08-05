@@ -75,12 +75,13 @@ namespace AzureUploader.DirectoryTrees
                 return ItemStatus.ItemToRemove;
             }
 
-            if (fileData.Source.Size != fileData.Target.Size)
+            if (fileData.Source.Size != fileData.Target.Size
+                || fileData.Source.Checksum != fileData.Target.Checksum)
             {
                 return ItemStatus.ItemToUpdate;
             }
 
-            return ItemStatus.ItemsWithTheSameSize;
+            return ItemStatus.ItemPresent;
         }
     }
 }

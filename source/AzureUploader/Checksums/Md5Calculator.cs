@@ -9,7 +9,7 @@ namespace AzureUploader.Checksums
         public string CalculateChecksum(string filePath)
         {
             using (var md5 = MD5.Create())
-            using (var stream = File.OpenRead(filePath))
+            using (var stream = File.OpenRead(filePath.Replace('/', '\\')))
             {
                 var hash = md5.ComputeHash(stream);
                 return BitConverter.ToString(hash).Replace("-", "").ToLower();

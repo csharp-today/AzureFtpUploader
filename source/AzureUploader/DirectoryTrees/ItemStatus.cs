@@ -5,7 +5,6 @@
         ItemPresent,
         ItemToCopy,
         ItemToRemove,
-        ItemToUpdate,
-        ItemsWithTheSameSize
+        ItemToUpdate
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AzureUploader.Checksums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,6 +10,8 @@ namespace AzureUploader.DirectoryTrees
         private readonly List<DirectoryTreeData> _directories = new List<DirectoryTreeData>();
         private readonly List<DirectoryTreeFileData> _files = new List<DirectoryTreeFileData>();
 
+        internal IChecksumProvider ChecksumProvider { get; }
+
         public IEnumerable<DirectoryTreeData> Directories => _directories;
         public IEnumerable<DirectoryTreeFileData> Files => _files;
         public string Level { get; }
@@ -17,12 +20,12 @@ namespace AzureUploader.DirectoryTrees
         public string Path => string.Concat(Parent?.Path, Parent?.Path is null ? "" : "/", Name);
         public ItemStatus Status { get; set; } = ItemStatus.ItemPresent;
 
-        public DirectoryTreeData(DirectoryTreeData parent, string name) =>
-            (Parent, Name, Level) = (parent, name, " " + parent?.Level);
+        public DirectoryTreeData(DirectoryTreeData parent, string name, IChecksumProvider checksumProvider) =>
+            (Parent, Name, Level, ChecksumProvider) = (parent, name, " " + parent?.Level, checksumProvider);
 
         public DirectoryTreeData AddDirectory(string name)
         {
-            var dir = new DirectoryTreeData(this, name);
+            var dir = new DirectoryTreeData(this, name, ChecksumProvider);
             _directories.Add(dir);
             return dir;
         }

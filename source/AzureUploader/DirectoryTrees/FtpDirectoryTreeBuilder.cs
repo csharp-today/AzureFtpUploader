@@ -1,12 +1,17 @@
-﻿using FluentFTP;
+﻿using AzureUploader.Checksums;
+using FluentFTP;
 
 namespace AzureUploader.DirectoryTrees
 {
     internal class FtpDirectoryTreeBuilder : IFtpDirectoryTreeBuilder
     {
+        private readonly IChecksumProvider _checksumProvider;
+
+        public FtpDirectoryTreeBuilder(IChecksumProvider checksumProvider) => _checksumProvider = checksumProvider;
+
         public DirectoryTree BuildUsingFtpDirectory(IFtpManager ftpManager, string ftpPath)
         {
-            var tree = new DirectoryTree(ftpPath);
+            var tree = new DirectoryTree(ftpPath, _checksumProvider);
             AddContent(tree, ftpManager, ftpPath);
             return tree;
         }
