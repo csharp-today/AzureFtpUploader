@@ -15,18 +15,14 @@ namespace AzureUploader
         private readonly IFtpTextReader _ftpTextReader;
         private readonly IFtpTextUploader _ftpTextUploader;
 
-        public ChecksumDataStorage ChecksumDataStorage { get; } = new ChecksumDataStorage();
-        public IClassLogger Logger { get; private set; }
-
-        public FtpManager(Func<FtpClient> clientFactory, ILogger logger)
+        public FtpManager(IChecksumCalculator checksumCalculator, ChecksumDataStorage checksumDataStorage , IFtpClientProvider ftpClientProvider, IClassLogger logger)
         {
-            Logger = new ClassLogger<AzureFtpUploader>(logger);
-            var ftpExecutor = new FtpCommandExecutor(new FtpClientProvider(clientFactory), Logger);
-            _ftpFileRemover = new FtpFileRemover(ftpExecutor, Logger);
+            var ftpExecutor = new FtpCommandExecutor(ftpClientProvider, logger);
+            _ftpFileRemover = new FtpFileRemover(ftpExecutor, logger);
             _ftpContentGetter = new FtpContentGetter(ftpExecutor);
-            _ftpDirectoryRemover = new FtpDirectoryRemover(ftpExecutor, _ftpContentGetter, _ftpFileRemover, Logger);
-            var ftpFileUploader = new FtpFileUploader(new Md5Calculator(), ftpExecutor, Logger, ChecksumDataStorage);
-            _ftpDirectoryUploader = new FtpDirectoryUploader(ftpExecutor, ftpFileUploader, Logger);
+            _ftpDirectoryRemover = new FtpDirectoryRemover(ftpExecutor, _ftpContentGetter, _ftpFileRemover, logger);
+            var ftpFileUploader = new FtpFileUploader(checksumCalculator, ftpExecutor, logger, checksumDataStorage);
+            _ftpDirectoryUploader = new FtpDirectoryUploader(ftpExecutor, ftpFileUploader, logger);
             _ftpTextReader = new FtpTextReader(ftpExecutor);
             _ftpTextUploader = new FtpTextUploader(ftpFileUploader);
         }
