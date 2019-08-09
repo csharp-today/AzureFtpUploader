@@ -18,7 +18,7 @@ namespace AzureUploader.DirectoryTrees
         public string Name { get; }
         public DirectoryTreeData Parent { get; }
         public string Path => string.Concat(Parent?.Path, Parent?.Path is null ? "" : "/", Name);
-        public ItemStatus Status { get; set; } = ItemStatus.ItemPresent;
+        public ItemStatus Status { get; set; } = ItemStatus.ItemAlreadyPresent;
 
         public DirectoryTreeData(DirectoryTreeData parent, string name, IChecksumProvider checksumProvider) =>
             (Parent, Name, Level, ChecksumProvider) = (parent, name, " " + parent?.Level, checksumProvider);
@@ -47,12 +47,9 @@ namespace AzureUploader.DirectoryTrees
                 sb.Append(Level);
                 sb.Append(" ");
                 sb.Append(file.Name);
-                if (file.Status != ItemStatus.ItemPresent)
-                {
-                    sb.Append(" (");
-                    sb.Append(file.Status);
-                    sb.Append(")");
-                }
+                sb.Append(" (");
+                sb.Append(file.Status);
+                sb.Append(")");
             }
 
             foreach (var directory in Directories)

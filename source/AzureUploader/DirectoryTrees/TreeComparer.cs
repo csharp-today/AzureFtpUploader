@@ -81,7 +81,7 @@ namespace AzureUploader.DirectoryTrees
                 return ItemStatus.ItemToUpdate;
             }
 
-            return ItemStatus.ItemPresent;
+            return ItemStatus.ItemAlreadyPresent;
         }
     }
 }

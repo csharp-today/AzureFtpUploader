@@ -2,7 +2,7 @@
 {
     internal enum ItemStatus
     {
-        ItemPresent,
+        ItemAlreadyPresent,
         ItemToCopy,
         ItemToRemove,
         ItemToUpdate

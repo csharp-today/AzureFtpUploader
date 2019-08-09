@@ -8,7 +8,7 @@
         public DirectoryTreeData Parent { get; }
         public long Size { get; set; }
         public DirectoryTreeFileData Source { get; set; }
-        public ItemStatus Status { get; set; } = ItemStatus.ItemPresent;
+        public ItemStatus Status { get; set; } = ItemStatus.ItemAlreadyPresent;
         public DirectoryTreeFileData Target { get; set; }
 
         public DirectoryTreeFileData(DirectoryTreeData parent, string name) =>
