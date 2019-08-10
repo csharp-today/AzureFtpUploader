@@ -11,8 +11,8 @@ namespace AzureUploader.FtpCommands
 
         public FtpDirectoryRemover(IFtpCommandExecutor ftpExecutor, IFtpContentGetter ftpContentGetter, IFtpFileRemover ftpFileRemover, IClassLogger logger) =>
             (_ftpExecutor, _ftpContentGetter, _ftpFileRemover, _logger) = (ftpExecutor, ftpContentGetter, ftpFileRemover, logger);
-
-        public void RemoveDirectory(string path)
+        
+        public void CleanDirectory(string path)
         {
             foreach (var item in _ftpContentGetter.GetContent(path))
             {
@@ -29,6 +29,12 @@ namespace AzureUploader.FtpCommands
                         break;
                 }
             }
+        }
+
+        public void RemoveDirectory(string path)
+        {
+            CleanDirectory(path);
+            _ftpExecutor.Execute(c => c.DeleteDirectory(path));
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using AzureUploader.Checksums;
 using AzureUploader.FtpCommands;
 using FluentFTP;
-using Microsoft.Extensions.Logging;
-using System;
 
 namespace AzureUploader
 {
@@ -27,6 +25,7 @@ namespace AzureUploader
             _ftpTextUploader = new FtpTextUploader(ftpFileUploader);
         }
 
+        public void CleanDirectory(string path) => _ftpDirectoryRemover.CleanDirectory(path);
         public FtpListItem[] GetContent(string path) => _ftpContentGetter.GetContent(path);
         public string ReadText(string path) => _ftpTextReader.ReadText(path);
         public void RemoveDirectory(string path) => _ftpDirectoryRemover.RemoveDirectory(path);

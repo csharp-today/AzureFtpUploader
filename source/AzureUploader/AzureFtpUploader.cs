@@ -22,7 +22,7 @@ namespace AzureUploader
             Log(diffTree.ToString());
 
             Log("CLEAN FTP");
-            _composer.FtpManager.RemoveDirectory(RootDirectory);
+            _composer.FtpManager.CleanDirectory(RootDirectory);
             _composer.FtpManager.RemoveFile(ChecksumFilePath);
             Log("PUSH NEW CONTENT");
             _composer.FtpManager.UploadDirectory(directory, RootDirectory);
