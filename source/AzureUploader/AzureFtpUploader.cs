@@ -21,13 +21,9 @@ namespace AzureUploader
             var diffTree = _composer.DifferenceGenerator.GenerateDifferenceTree(directory, RootDirectory, ChecksumFilePath);
             Log(diffTree.ToString());
 
-            Log("CLEAN FTP");
-            _composer.FtpManager.CleanDirectory(RootDirectory);
-            _composer.FtpManager.RemoveFile(ChecksumFilePath);
-            Log("PUSH NEW CONTENT");
-            _composer.FtpManager.UploadDirectory(directory, RootDirectory);
-            Log("UPLOAD CHECKSUMs");
-            _composer.FtpManager.UploadText(_composer.ChecksumDataStorage.GetStorageDump(), ChecksumFilePath);
+            Log("UPDATE FTP CONTENT");
+            _composer.ContentUpdater.UpdateContent(diffTree, directory, RootDirectory, ChecksumFilePath);
+
             Log("DEPLOYMENT DONE");
         }
 
