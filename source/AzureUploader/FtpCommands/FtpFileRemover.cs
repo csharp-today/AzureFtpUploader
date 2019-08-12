@@ -11,7 +11,7 @@
         public void RemoveFile(string path)
         {
             _logger.Log($"Size={_ftpExecutor.Execute(c => c.GetFileSize(path))}");
-            _ftpExecutor.Execute(c => c.DeleteFile(path));
+            _ftpExecutor.Execute(c => c.DeleteFile(path), c => !c.FileExists(path));
         }
     }
 }
