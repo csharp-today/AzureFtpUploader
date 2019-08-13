@@ -25,7 +25,7 @@ namespace AzureUploader.FtpCommands
                         break;
                     case FtpFileSystemObjectType.Directory:
                         RemoveDirectory(item.FullName);
-                        _ftpExecutor.Execute(c => c.DeleteDirectory(item.FullName));
+                        CallFtpRemoveDirectory(item.FullName);
                         break;
                 }
             }
@@ -34,7 +34,10 @@ namespace AzureUploader.FtpCommands
         public void RemoveDirectory(string path)
         {
             CleanDirectory(path);
-            _ftpExecutor.Execute(c => c.DeleteDirectory(path));
+            CallFtpRemoveDirectory(path);
         }
+
+        private void CallFtpRemoveDirectory(string path) =>
+            _ftpExecutor.Execute(c => c.DeleteDirectory(path), c => !c.DirectoryExists(path));
     }
 }
