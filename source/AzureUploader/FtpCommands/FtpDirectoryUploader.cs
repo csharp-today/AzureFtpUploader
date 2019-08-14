@@ -19,7 +19,7 @@ namespace AzureUploader.FtpCommands
                 var name = Path.GetFileName(dir);
                 var ftpPath = $"{targetPath}/{name}";
                 _logger.Log("Create: " + ftpPath);
-                _ftpExecutor.Execute(c => c.CreateDirectory(ftpPath));
+                _ftpExecutor.Execute(c => c.CreateDirectory(ftpPath), c => c.DirectoryExists(ftpPath));
                 UploadDirectory(dir, ftpPath);
             }
 
