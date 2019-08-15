@@ -27,7 +27,13 @@ namespace AzureUploader
             var targetTree = _ftpDirectoryTreeBuilder.BuildUsingFtpDirectory(ftpPath);
 
             _logger.Log("Read FTP checksums");
-            _checksumDataStorage.RestoreFromDump(_ftpManager.ReadText(checksumFilePath));
+            if (_ftpManager.FileExist(checksumFilePath))
+            {
+                _checksumDataStorage.RestoreFromDump(_ftpManager.ReadText(checksumFilePath));
+            }
+            {
+                _logger.Log("FTP checksum file doesn't exist");
+            }
 
             _logger.Log("Compare source and target");
             return _treeComparer.Compare(localTree, targetTree);

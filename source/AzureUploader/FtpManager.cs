@@ -9,6 +9,7 @@ namespace AzureUploader
         private readonly IFtpContentGetter _ftpContentGetter;
         private readonly IFtpDirectoryRemover _ftpDirectoryRemover;
         private readonly IFtpDirectoryUploader _ftpDirectoryUploader;
+        private readonly IFtpExistenceChecker _ftpExistenceChecker;
         private readonly IFtpFileRemover _ftpFileRemover;
         private readonly IFtpTextReader _ftpTextReader;
         private readonly IFtpTextUploader _ftpTextUploader;
@@ -21,11 +22,13 @@ namespace AzureUploader
             _ftpDirectoryRemover = new FtpDirectoryRemover(ftpExecutor, _ftpContentGetter, _ftpFileRemover, logger);
             var ftpFileUploader = new FtpFileUploader(checksumCalculator, ftpExecutor, logger, checksumDataStorage);
             _ftpDirectoryUploader = new FtpDirectoryUploader(ftpExecutor, ftpFileUploader, logger);
+            _ftpExistenceChecker = new FtpExistenceChecker(ftpExecutor);
             _ftpTextReader = new FtpTextReader(ftpExecutor);
             _ftpTextUploader = new FtpTextUploader(ftpFileUploader);
         }
 
         public void CleanDirectory(string path) => _ftpDirectoryRemover.CleanDirectory(path);
+        public bool FileExist(string path) => _ftpExistenceChecker.FileExist(path);
         public FtpListItem[] GetContent(string path) => _ftpContentGetter.GetContent(path);
         public string ReadText(string path) => _ftpTextReader.ReadText(path);
         public void RemoveDirectory(string path) => _ftpDirectoryRemover.RemoveDirectory(path);

@@ -3,7 +3,7 @@ using AzureUploader.FtpCommands;
 
 namespace AzureUploader
 {
-    internal interface IFtpManager : IFtpContentGetter, IFtpDirectoryRemover, IFtpFileRemover, IFtpDirectoryUploader, IFtpTextReader, IFtpTextUploader
+    internal interface IFtpManager : IFtpContentGetter, IFtpDirectoryRemover, IFtpExistenceChecker, IFtpFileRemover, IFtpDirectoryUploader, IFtpTextReader, IFtpTextUploader
     {
     }
 }
