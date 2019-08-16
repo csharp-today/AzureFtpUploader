@@ -16,11 +16,11 @@ namespace AzureUploader.FtpCommands
         public void UploadFile(string filePath, string targetPath)
         {
             _logger.Log("Upload: " + targetPath);
-            _logger.Log($"Size={new FileInfo(filePath).Length}");
+            _logger.Log($"  Size={new FileInfo(filePath).Length}");
 
             var checksum = _checksumCalculator.CalculateChecksum(filePath);
             _checksumDataStorage.Store(targetPath, checksum);
-            _logger.Log($"MD5={checksum}");
+            _logger.Log($"  MD5={checksum}");
 
             _ftpExecutor.Execute(c => c.UploadFile(filePath, targetPath));
         }
