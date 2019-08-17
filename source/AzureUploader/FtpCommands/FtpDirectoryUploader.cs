@@ -5,11 +5,11 @@ namespace AzureUploader.FtpCommands
     internal class FtpDirectoryUploader : IFtpDirectoryUploader
     {
         private readonly IClassLogger _logger;
-        private readonly IFtpCommandExecutor _ftpExecutor;
+        private readonly IFtpDirectoryCreator _ftpDirectoryCreator;
         private readonly IFtpFileUploader _ftpFileUploader;
 
-        public FtpDirectoryUploader(IFtpCommandExecutor ftpExecutor, IFtpFileUploader ftpFileUploader, IClassLogger logger) =>
-            (_ftpExecutor, _ftpFileUploader, _logger) = (ftpExecutor, ftpFileUploader, logger);
+        public FtpDirectoryUploader(IFtpDirectoryCreator ftpDirectoryCreator, IFtpFileUploader ftpFileUploader, IClassLogger logger) =>
+            (_ftpDirectoryCreator, _ftpFileUploader, _logger) = (ftpDirectoryCreator, ftpFileUploader, logger);
 
         public void UploadDirectory(string directoryPath, string targetPath)
         {
@@ -19,7 +19,7 @@ namespace AzureUploader.FtpCommands
                 var name = Path.GetFileName(dir);
                 var ftpPath = $"{targetPath}/{name}";
                 _logger.Log("Create: " + ftpPath);
-                _ftpExecutor.Execute(c => c.CreateDirectory(ftpPath), c => c.DirectoryExists(ftpPath));
+                _ftpDirectoryCreator.CreateDirectory(ftpPath);
                 UploadDirectory(dir, ftpPath);
             }
 

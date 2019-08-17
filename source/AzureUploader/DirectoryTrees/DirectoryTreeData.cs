@@ -19,6 +19,7 @@ namespace AzureUploader.DirectoryTrees
         public DirectoryTreeData Parent { get; }
         public string Path => string.Concat(Parent?.Path, Parent?.Path is null ? "" : "/", Name);
         public ItemStatus Status { get; set; } = ItemStatus.ItemAlreadyPresent;
+        public DirectoryTreeData Target { get; set; }
 
         public DirectoryTreeData(DirectoryTreeData parent, string name, IChecksumProvider checksumProvider) =>
             (Parent, Name, Level, ChecksumProvider) = (parent, name, " " + parent?.Level, checksumProvider);
