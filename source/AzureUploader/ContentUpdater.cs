@@ -24,7 +24,7 @@ namespace AzureUploader
 
         private void UpdateDirectory(DirectoryTreeData directory)
         {
-            _logger.Log($"SYNCING {directory.Parent}");
+            _logger.Log($"SYNCING {directory.Path}");
             _logger.Log($"Status: {directory.Status}");
             UpdateFiles(directory);
 
