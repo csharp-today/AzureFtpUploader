@@ -74,7 +74,7 @@ namespace AzureUploader
             }
 
             DirectoryTreeData[] GetByStatus(ItemStatus status) => directory.Directories.Where(d => d.Status == status).ToArray();
-            void Log(DirectoryTreeData dictionary) => _logger.Log("  " + directory.Name);
+            void Log(DirectoryTreeData dictionary) => _logger.Log("====> " + directory.Name);
         }
 
         private void UpdateFiles(DirectoryTreeData directory)
@@ -126,7 +126,7 @@ namespace AzureUploader
             }
 
             DirectoryTreeFileData[] GetByStatus(ItemStatus status) => directory.Files.Where(f => f.Status == status).ToArray();
-            void Log(DirectoryTreeFileData file) => _logger.Log("  " + file.Name);
+            void Log(DirectoryTreeFileData file) => _logger.Log("====> " + file.Name);
         }
     }
 }
