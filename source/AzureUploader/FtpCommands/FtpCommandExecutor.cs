@@ -1,5 +1,6 @@
 ﻿using FluentFTP;
 using System;
+using System.Text;
 using System.Threading;
 
 namespace AzureUploader.FtpCommands
@@ -17,6 +18,7 @@ namespace AzureUploader.FtpCommands
 
         public void Execute(Action<FtpClient> operation, Func<bool> wasSuccessfulCheck = null)
         {
+            var lazyLog = new StringBuilder();
             int time = StartTime;
             int count = StartCount;
             while (count > 0)
@@ -32,24 +34,24 @@ namespace AzureUploader.FtpCommands
 
                     if (wasSuccessfulCheck != null)
                     {
-                        _logger.Log("Operation failed: " + error.Message);
-                        _logger.Log("Running success check...");
+                        lazyLog.AppendLine("Operation failed: " + error.Message);
+                        lazyLog.AppendLine("Running success check...");
 
                         try
                         {
                             if (wasSuccessfulCheck())
                             {
-                                _logger.Log("Operation was successful after all.");
+                                lazyLog.AppendLine("Operation was successful after all.");
                                 return;
                             }
                         }
                         catch (Exception checkError)
                         {
-                            _logger.Log("Ignoring success check - it failed: " + checkError.Message);
+                            lazyLog.AppendLine("Ignoring success check - it failed: " + checkError.Message);
                         }
                     }
 
-                    UpdateLoop(error, ref time, ref count);
+                    UpdateLoop(error, ref time, ref count, lazyLog);
                 }
             }
 
@@ -61,6 +63,7 @@ namespace AzureUploader.FtpCommands
 
         public T Execute<T>(Func<FtpClient, T> operation)
         {
+            var lazyLog = new StringBuilder();
             int time = StartTime;
             int count = StartCount;
             while (count > 0)
@@ -74,23 +77,25 @@ namespace AzureUploader.FtpCommands
                     // Usually Azure FTP needs to stage a new connection
                     _ftpClientProvider.CloseActiveClient();
 
-                    UpdateLoop(error, ref time, ref count);
+                    UpdateLoop(error, ref time, ref count, lazyLog);
                 }
             }
 
             throw new NotImplementedException();
         }
 
-        private void UpdateLoop(Exception error, ref int time, ref int count)
+        private void UpdateLoop(Exception error, ref int time, ref int count, StringBuilder lazyLog)
         {
             count--;
-            _logger.Log("Failed - retry count: " + count);
+            lazyLog.AppendLine("Failed - retry count: " + count);
             if (count <= 0)
             {
+                // Print lazy-log only in case of failure
+                _logger.Log(lazyLog.ToString());
                 throw new InvalidOperationException("Can't complete FTP operation", error);
             }
 
-            _logger.Log($"Will retry in {time} seconds");
+            lazyLog.AppendLine($"Will retry in {time} seconds");
             Thread.Sleep(time * 1000);
             time *= 2;
         }
