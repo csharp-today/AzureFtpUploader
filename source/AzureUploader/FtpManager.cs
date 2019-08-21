@@ -22,13 +22,12 @@ namespace AzureUploader
             _ftpContentGetter = new FtpContentGetter(ftpExecutor);
             _ftpDirectoryCreator = new FtpDirectoryCreator(ftpExecutor);
             _ftpDirectoryRemover = new FtpDirectoryRemover(ftpExecutor, _ftpContentGetter, _ftpFileRemover, logger);
-            var ftpFileUploader = new FtpFileUploader(checksumCalculator, ftpExecutor, logger, checksumDataStorage);
-            _ftpDirectoryUploader = new FtpDirectoryUploader(_ftpDirectoryCreator, ftpFileUploader, logger);
+            _ftpFileUploader = new FtpFileUploader(checksumCalculator, ftpExecutor, checksumDataStorage);
+            _ftpDirectoryUploader = new FtpDirectoryUploader(_ftpDirectoryCreator, _ftpFileUploader, logger);
             _ftpExistenceChecker = new FtpExistenceChecker(ftpExecutor);
-            _ftpFileRemover = new FtpFileRemover(ftpExecutor, logger);
-            _ftpFileUploader = new FtpFileUploader(checksumCalculator, ftpExecutor, logger, checksumDataStorage);
+            _ftpFileRemover = new FtpFileRemover(ftpExecutor);
             _ftpTextReader = new FtpTextReader(ftpExecutor);
-            _ftpTextUploader = new FtpTextUploader(ftpFileUploader);
+            _ftpTextUploader = new FtpTextUploader(_ftpFileUploader);
         }
 
         public void CleanDirectory(string path) => _ftpDirectoryRemover.CleanDirectory(path);

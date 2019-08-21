@@ -74,7 +74,7 @@ namespace AzureUploader
             }
 
             DirectoryTreeData[] GetByStatus(ItemStatus status) => directory.Directories.Where(d => d.Status == status).ToArray();
-            void Log(DirectoryTreeData dictionary) => _logger.Log("====> " + directory.Name);
+            void Log(DirectoryTreeData dir) => _logger.Log("====> " + dir.Name);
         }
 
         private void UpdateFiles(DirectoryTreeData directory)
