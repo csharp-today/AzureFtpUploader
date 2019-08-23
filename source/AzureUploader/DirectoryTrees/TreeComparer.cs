@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using AzureUploader.Checksums;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AzureUploader.DirectoryTrees
@@ -23,6 +24,10 @@ namespace AzureUploader.DirectoryTrees
                 diffFile.Target = diff.Target?.Files?.FirstOrDefault(f => f.Name == sourceFile.Name);
                 diffFile.Status = GetFileStatus(diffFile);
                 AddUniqueStatus(diffFile.Status);
+                if (diffFile.Target is null)
+                {
+                    diffFile.Target = new DirectoryTreeFileData(diffFile.Parent.Target, diffFile.Name);
+                }
             }
 
             foreach (var targetFile in diff.Target?.Files ?? Enumerable.Empty<DirectoryTreeFileData>())
@@ -42,6 +47,10 @@ namespace AzureUploader.DirectoryTrees
                 diffDirectory.Target = diff.Target?.Directories?.FirstOrDefault(d => d.Name == sourceDirectory.Name);
                 CompareDirectory(sourceDirectory, diffDirectory);
                 AddUniqueStatus(diffDirectory.Status);
+                if (diffDirectory.Target is null)
+                {
+                    diffDirectory.Target = new DirectoryTreeData(diffDirectory.Parent.Target, diffDirectory.Name, new EmptyChecksumProvider());
+                }
             }
 
             foreach (var targetDirectory in diff.Target?.Directories ?? Enumerable.Empty<DirectoryTreeData>())
